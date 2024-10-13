@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.4.30"
+    kotlin("multiplatform") version "2.0.20"
     `maven-publish`
 }
 
@@ -13,17 +13,23 @@ repositories {
 kotlin {
     jvm()
 
-    ios {
-        val platform = when (name) {
-            "iosX64" -> "iphonesimulator"
-            "iosArm64" -> "iphoneos"
-            else -> error("Unsupported target $name")
-        }
-        compilations.getByName("main") {
-            cinterops.create("SwiftChachaPoly") {
-                val interopTask = tasks[interopProcessingTaskName]
-                interopTask.dependsOn(":SwiftChachaPoly:build${platform.capitalize()}")
-                includeDirs.headerFilterOnly("$rootDir/SwiftChachaPoly/build/Release-$platform/include")
+    listOf(iosSimulatorArm64(), iosX64(), iosArm64()).forEach {
+        with (it) {
+            val platform = when (name) {
+                "iosSimulatorArm64" -> "iphonesimulator"
+                "iosX64" -> "iphonesimulator"
+                "iosArm64" -> "iphoneos"
+                else -> error("Unsupported target $name")
+            }
+            compilations.getByName("main") {
+                cinterops.create("SwiftChachaPoly") {
+                    val interopTask = tasks[interopProcessingTaskName]
+                    interopTask.dependsOn(":SwiftChachaPoly:build${platform.capitalize()}")
+                    includeDirs.headerFilterOnly("$rootDir/SwiftChachaPoly/build/Release-$platform/include")
+                }
+            }
+            binaries.all {
+                linkerOpts += "-ld64"
             }
         }
     }
@@ -38,7 +44,15 @@ kotlin {
         }
 
         all {
-            languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
+            languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
+            languageSettings.optIn("kotlinx.cinterop.BetaInteropApi")
+        }
+    }
+    targets.configureEach {
+        compilations.configureEach {
+            compileTaskProvider.configure {
+                compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
+            }
         }
     }
 }

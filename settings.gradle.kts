@@ -1,6 +1,4 @@
 
 rootProject.name = "KMChachaPoly"
 
-include(
-    ":SwiftChachaPoly"
-)
+include(":SwiftChachaPoly")

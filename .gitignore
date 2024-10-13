@@ -1,5 +1,6 @@
 # Build
 build/
+local.properties
 
 # Idea
 .idea
@@ -8,6 +9,9 @@ build/
 # Gradle
 .gradle
 .gradletasknamecache
+
+# Kotlin
+.kotlin
 
 # OS
 .DS_Store

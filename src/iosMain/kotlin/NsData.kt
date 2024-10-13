@@ -1,4 +1,3 @@
-@file:OptIn(ExperimentalUnsignedTypes::class)
 package org.demo.crypto
 
 import kotlinx.cinterop.addressOf
@@ -8,8 +7,7 @@ import platform.Foundation.NSData
 import platform.Foundation.create
 import platform.posix.memcpy
 
-
-internal inline fun ByteArray.toData(offset: Int = 0, length: Int = size - offset): NSData {
+internal fun ByteArray.toData(offset: Int = 0, length: Int = size - offset): NSData {
     require(offset + length <= size) { "offset + length > size" }
     if (isEmpty()) return NSData()
     val pinned = pin()
